@@ -1,8 +1,8 @@
-SPI Master Controller
+# SPI Master Controller
 
 A modular Verilog RTL implementation of an 8-bit SPI (Serial Peripheral Interface) Master Controller.
 
-Overview
+## Overview
 
 This project implements an 8-bit SPI Master Controller using Verilog HDL.
 
@@ -10,119 +10,133 @@ The design generates the SPI clock, controls the active-low slave-select signal,
 
 The controller is implemented using a modular RTL architecture consisting of:
 
-SPI Clock Divider
-SPI Finite State Machine (FSM)
-PISO Shift Register
-SPI Bit Counter
-Top-Level SPI Master Module
+* SPI Clock Divider
+* SPI Finite State Machine (FSM)
+* PISO Shift Register
+* SPI Bit Counter
+* Top-Level SPI Master Module
 
 A Verilog testbench is also provided to verify the functionality of the design through simulation.
 
-Features
-8-bit SPI Master Controller
-Modular RTL architecture
-FSM-based SPI transaction control
-Clock divider for SPI clock generation
-Parallel-In Serial-Out (PISO) shift register
-3-bit bit counter for tracking an 8-bit transfer
-Active-low Slave Select (SS)
-Serial data transmission through MOSI
-Verilog testbench for functional verification
-Multiple 8-bit test cases
-System Architecture
+## Features
+
+* 8-bit SPI Master Controller
+* Modular RTL architecture
+* FSM-based SPI transaction control
+* Clock divider for SPI clock generation
+* Parallel-In Serial-Out (PISO) shift register
+* 3-bit bit counter for tracking an 8-bit transfer
+* Active-low Slave Select (SS)
+* Serial data transmission through MOSI
+* Verilog testbench for functional verification
+* Multiple 8-bit test cases
+
+---
+
+# System Architecture
 
 The SPI Master consists of four primary functional blocks controlled by a top-level module.
 
-                         SPI MASTER CONTROLLER
-                                  |
-                    +-------------+-------------+
-                    |                           |
-                    v                           v
-             +-------------+             +-------------+
-             | SPI Clock   |             |  SPI FSM    |
-             |  Divider    |             |             |
-             +------+------+             +------+------+
-                    |                           |
-                    | SCLK                      | Control
-                    |                           |
-                    |                 +---------+---------+
-                    |                 |                   |
-                    v                 v                   v
-             +-------------+    +-------------+    +-------------+
-             | SPI Clock   |    | PISO Shift  |    | Bit Counter |
-             |             |    | Register    |    |             |
-             +-------------+    +------+------+    +-------------+
-                                      |
-                                      |
-                                      v
-                                    MOSI
+```text
+                    SPI MASTER CONTROLLER
+                             |
+              +--------------+--------------+
+              |                             |
+              v                             v
+       +-------------+               +-------------+
+       | SPI Clock   |               |  SPI FSM    |
+       |  Divider    |               |             |
+       +------+------+               +------+------+
+              |                             |
+              | SCLK                        | Control
+              |                             |
+              |                 +-----------+-----------+
+              |                 |           |           |
+              v                 v           v           v
+       +-------------+   +-------------+ +-------------+
+       | SPI Clock   |   | PISO Shift  | | Bit Counter |
+       |             |   | Register    | |             |
+       +-------------+   +------+------+ +-------------+
+                                |
+                                |
+                                v
+                              MOSI
 
-                                  SPI FSM
-                                     |
-                                     v
-                                    SS
-RTL Modules
-1. SPI Clock Divider
+                            SPI FSM
+                               |
+                               v
+                              SS
+```
 
-File: rtl/spi_clk_divider.v
+---
+
+# RTL Modules
+
+## 1. SPI Clock Divider
+
+**File:** `rtl/spi_clk_divider.v`
 
 The SPI clock divider generates the SPI serial clock (SCLK) from the system clock.
 
 It uses a counter-based clock division mechanism to generate the required SPI clock frequency.
 
-2. SPI Finite State Machine
+## 2. SPI Finite State Machine
 
-File: rtl/spi_fsm.v
+**File:** `rtl/spi_fsm.v`
 
 The SPI controller uses a finite state machine to control the sequence of an SPI transaction.
 
 The FSM consists of the following states:
 
-IDLE
-LOAD
-TRANSFER
-DONE
+* `IDLE`
+* `LOAD`
+* `TRANSFER`
+* `DONE`
 
 The FSM controls the transaction sequence, including loading the transmit data, enabling the SPI transfer, controlling the slave-select signal, and completing the transaction.
 
-3. PISO Shift Register
+## 3. PISO Shift Register
 
-File: rtl/spi_shift_reg_PISO.v
+**File:** `rtl/spi_shift_reg_PISO.v`
 
 The Parallel-In Serial-Out (PISO) shift register is responsible for converting the parallel transmit data into a serial data stream.
 
 The module:
 
-Loads an 8-bit parallel data word.
-Shifts the data serially.
-Provides the serial output through the MOSI signal.
-4. SPI Bit Counter
+* Loads an 8-bit parallel data word
+* Shifts the data serially
+* Provides the serial output through the MOSI signal
 
-File: rtl/spi_bit_counter.v
+## 4. SPI Bit Counter
+
+**File:** `rtl/spi_bit_counter.v`
 
 The bit counter keeps track of the number of bits transmitted during an SPI transaction.
 
 It is used to determine when the complete 8-bit data transfer has finished.
 
-5. Top-Level SPI Master
+## 5. Top-Level SPI Master
 
-File: rtl/spi_master_top.v
+**File:** `rtl/spi_master_top.v`
 
 The top-level module integrates all the individual RTL blocks into a complete SPI Master Controller.
 
 The module connects:
 
-SPI clock divider
-SPI FSM
-PISO shift register
-Bit counter
+* SPI clock divider
+* SPI FSM
+* PISO shift register
+* Bit counter
 
 and provides the external SPI interface signals.
 
-SPI Transaction Flow
+---
+
+# SPI Transaction Flow
 
 The SPI transaction follows the sequence below:
 
+```text
               Start
                 |
                 v
@@ -152,52 +166,65 @@ The SPI transaction follows the sequence below:
              +------+
              | IDLE |
              +------+
+```
 
 During the transfer:
 
-SS is asserted low.
-SCLK is generated by the clock divider.
-Transmit data is shifted through the PISO register.
-MOSI carries the serial data.
-The bit counter tracks the transmitted bits.
-After the complete 8-bit transfer, the controller enters the DONE state.
-Verification
+* `SS` is asserted low.
+* `SCLK` is generated by the clock divider.
+* Transmit data is shifted through the PISO register.
+* `MOSI` carries the serial data.
+* The bit counter tracks the transmitted bits.
+* After the complete 8-bit transfer, the controller enters the `DONE` state.
+
+---
+
+# Verification
 
 A Verilog testbench is provided for functional verification.
 
-Testbench: testbench/spi_tb.v
+**Testbench:** `testbench/spi_tb.v`
 
 The testbench generates a 100 MHz system clock and applies multiple 8-bit data transfers to the SPI Master Controller.
 
-Test Case 1
-Binary : 10110011
-Hex    : 0xB3
-Test Case 2
-Binary : 11001100
-Hex    : 0xCC
+## Test Cases
+
+| Test Case   | Binary     | Hex    |
+| ----------- | ---------- | ------ |
+| Test Case 1 | `10110011` | `0xB3` |
+| Test Case 2 | `11001100` | `0xCC` |
 
 The testbench monitors the SPI interface signals during the transfer.
 
 The primary signals of interest are:
 
-SS
-SCLK
-MOSI
-Simulation
+* `SS`
+* `SCLK`
+* `MOSI`
+
+---
+
+# Simulation
 
 A Vivado waveform configuration file is included in the repository:
 
+```text
 simulation/tb_spi_master_top_behav.wcfg
+```
 
 The waveform configuration can be used to inspect the timing relationship between:
 
-Slave Select (SS)
-SPI Clock (SCLK)
-Master Out Slave In (MOSI)
+* Slave Select (`SS`)
+* SPI Clock (`SCLK`)
+* Master Out Slave In (`MOSI`)
 
 during an SPI transaction.
 
-Project Structure
+---
+
+# Project Structure
+
+```text
 spi-master-controller/
 │
 ├── rtl/
@@ -214,43 +241,57 @@ spi-master-controller/
 │   └── tb_spi_master_top_behav.wcfg
 │
 └── README.md
-Tools and Technologies
-Verilog HDL
-RTL Design
-Digital Design
-SPI Protocol
-Finite State Machines
-Vivado Simulator
-Git
-GitHub
-Key Design Concepts Demonstrated
+```
+
+---
+
+# Tools and Technologies
+
+* Verilog HDL
+* RTL Design
+* Digital Design
+* SPI Protocol
+* Finite State Machines
+* Vivado Simulator
+* Git
+* GitHub
+
+---
+
+# Key Design Concepts Demonstrated
 
 This project demonstrates practical implementation of several RTL design concepts:
 
-Modular RTL design
-Finite State Machine design
-Clock division
-Sequential logic
-Counters
-Shift registers
-Serial communication
-Testbench development
-Functional simulation
-Hardware interface design
-Future Improvements
+* Modular RTL design
+* Finite State Machine design
+* Clock division
+* Sequential logic
+* Counters
+* Shift registers
+* Serial communication
+* Testbench development
+* Functional simulation
+* Hardware interface design
+
+---
+
+# Future Improvements
 
 Potential extensions to the design include:
 
-Support for SPI Modes 0–3 through configurable CPOL and CPHA
-Configurable SPI clock frequency
-Configurable data width
-MISO support for full-duplex SPI communication
-Parameterized clock divider
-SystemVerilog-based verification
-Assertion-based verification
-UVM-based verification
-Author
+* Support for SPI Modes 0–3 through configurable CPOL and CPHA
+* Configurable SPI clock frequency
+* Configurable data width
+* MISO support for full-duplex SPI communication
+* Parameterized clock divider
+* SystemVerilog-based verification
+* Assertion-based verification
+* UVM-based verification
 
-Aditya Joshi
+---
 
-Electronics | FPGA | RTL Design | VLSI
+# Author
+
+**Aditya Joshi**
+
+*Electronics | FPGA | RTL Design | VLSI*
